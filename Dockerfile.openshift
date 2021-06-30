@@ -1,0 +1,12 @@
+FROM registry.ci.openshift.org/ocp/builder:rhel-8-golang-1.16-openshift-4.9 AS builder
+WORKDIR /
+COPY . .
+RUN make build
+
+FROM registry.ci.openshift.org/ocp/4.9:base
+COPY --from=builder /contour /usr/bin/
+ENTRYPOINT ["/usr/bin/contour"]
+LABEL io.openshift.release.operator="true"
+LABEL io.k8s.display-name="Kubernetes Contour" \
+      io.k8s.description="Ingress controller that works by deploying the Envoy proxy as a reverse proxy and load balancer." \
+      maintainer="<aos-network-edge-staff@redhat.com>"
